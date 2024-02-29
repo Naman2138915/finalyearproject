@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h1>Sign Up</h1>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="input-group">
+        <label for="id_username">Username</label>
+        {{ form.username }}
+      </div>
+      <div class="input-group">
+        <label for="id_password1">Password</label>
+        {{ form.password1 }}
+      </div>
+      <div class="input-group">
+        <label for="id_password2">Confirm Password</label>
+        {{ form.password2 }}
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+    <p>Already have an account? <a href="{% url 'base:login' %}">Login</a></p>
+  </div>
+</div>
+{% endblock content %}
