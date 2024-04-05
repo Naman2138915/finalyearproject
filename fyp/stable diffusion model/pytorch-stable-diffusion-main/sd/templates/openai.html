@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+    <h1>Generate Image</h1>
+    <form action="/openaiimage" method="post">
+        <input type="text" name="text" placeholder="Enter text here" required/>
+        <input type="submit" value="Generate Image"/>
+    </form>
+
+    {% if image_url %}
+    <div class="image">
+        <img src="{{ image_url }}"/>
+    </div>
+    {% endif %}
+</body>
+</html>

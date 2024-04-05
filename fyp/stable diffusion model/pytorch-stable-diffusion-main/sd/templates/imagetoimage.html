@@ -8,9 +8,10 @@
 <body>
     <h1>Image Generation App</h1>
     <b>Name:</b> {{user.name}} <br>
-    <b>Name:</b> {{user.email}} <br>
-    <b>Name:</b> {{user.password}} <br>
-    <form action="/generatefromimage" method="post" enctype="multipart/form-data">
+    <b>Email:</b> {{user.email}} <br>
+    <!-- Remove password display for security reasons -->
+
+    <form id="generate-form" action="/generatefromimage" method="post" enctype="multipart/form-data">
         <label for="prompt">Prompt:</label><br>
         <input type="text" id="prompt" name="prompt"><br>
         <label for="uncond_prompt">Unconditional Prompt:</label><br>
@@ -22,8 +23,14 @@
     </form>
     <div id="output"></div>
 
+    <!-- Display the generated image -->
+    <img id="generated-image" style="display: none;">
+
+    <!-- Button to navigate to image editor page -->
+    <button id="edit-button" style="display: none;">Edit Image</button>
+
     <script>
-        document.querySelector("form").addEventListener("submit", function(event) {
+        document.getElementById("generate-form").addEventListener("submit", function(event) {
             event.preventDefault();
             const form = event.target;
             const formData = new FormData(form);
@@ -34,11 +41,20 @@
             .then(response => response.blob())
             .then(blob => {
                 const url = URL.createObjectURL(blob);
-                const img = document.createElement("img");
-                img.src = url;
-                document.getElementById("output").innerHTML = "";
-                document.getElementById("output").appendChild(img);
+                // Display the generated image
+                document.getElementById("generated-image").src = url;
+                document.getElementById("generated-image").style.display = "block";
+                // Store the image URL in sessionStorage
+                sessionStorage.setItem("imageURL", url);
+                // Show the edit button
+                document.getElementById("edit-button").style.display = "block";
             });
+        });
+
+        // Add event listener to edit button
+        document.getElementById("edit-button").addEventListener("click", function() {
+            // Redirect to the image editor page
+            window.location.href = "/imageeditor";
         });
     </script>
 </body>

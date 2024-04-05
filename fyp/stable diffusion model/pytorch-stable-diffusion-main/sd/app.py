@@ -1,20 +1,38 @@
-import PIL
-from flask import Flask, render_template, request, send_file, redirect, session
+
+from PIL import Image as PILImage
+from flask import Flask, jsonify, render_template, request, send_file, redirect, session, url_for
 from PIL import Image
 from io import BytesIO
+import openai
 import loader
 import modelpipeline
 from transformers import CLIPTokenizer
 import torch
 from flask_sqlalchemy import SQLAlchemy
 import bcrypt
+import numpy as np
+import os
+import tempfile     
+from openai import OpenAI
+import base64
+import requests
+
+
+
+
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 app.secret_key = 'secret_key'
 
+api_key = "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"
+openai.api_key = "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"
 
+client = OpenAI()
+api_key = "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"
+openai.api_key = "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"
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,6 +67,7 @@ tokenizer = CLIPTokenizer("../data/vocab.json", merges_file="../data/merges.txt"
 model_file = "../data/v1-5-pruned-emaonly.ckpt"
 models = loader.preload_models_from_standard_weights(model_file, DEVICE)
 
+
 def generate_image(prompt, uncond_prompt, strength, image_file):
     input_image = Image.open(image_file)
 
@@ -82,6 +101,20 @@ def generate_image(prompt, uncond_prompt, strength, image_file):
     output_buffer.seek(0)
 
     return output_buffer
+
+@app.route("/openaiimage", methods=['GET','POST'])
+def openaiimage():
+    image_url = None
+    if request.method == 'POST':
+        text = request.form['text']
+        response = openai.images.generate(
+        # Update with the desired engine
+            prompt=text,
+            size="1024x1024",
+            n=1
+        )
+        image_url = response.data[0].url
+    return render_template('openai.html', image_url=image_url)
 
 @app.route("/generatefromimage", methods=["POST"])
 def generatefromimage():
@@ -118,6 +151,14 @@ def texttoimage():
     
     return render_template('/login.html')
 
+@app.route('/openai')
+def openai_page():
+    if session['name']:
+        user = User.query.filter_by(email=session['email']).first()
+        return render_template('openai.html', user=user)
+    
+    return render_template('/login.html')
+
 @app.route('/', methods=['GET','POST'])
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -128,11 +169,12 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
             session['email'] = user.email
+            session['name'] = user.name  # Add this line to store the user's name
             return redirect('/index')
         else:
             return render_template('login.html', error='Invalid email or password')   
     return render_template('login.html')
-
+    
 @app.route('/logout')
 def logout():
     session.pop('email', None)
@@ -196,6 +238,72 @@ def generate():
     except Exception as e:
         print("Error generating image:", e)
         return "Failed to generate image.", 500
+
+@app.route('/imageeditor')
+def image_editor():
+    return render_template('imageeditor.html')
+
+@app.route('/caption')
+def caption():
+    return render_template('caption.html')
+
+@app.route('/process', methods=['POST'])
+def process():
+    # Extract text inputs from the form
+    text1 = request.form['text1']
+    
+    def encode_image(image_path):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
+    
+    image_path = "../images/dog.jpg"
+    base64_image = encode_image(image_path)
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+
+    payload = {
+        "model": "gpt-4-vision-preview",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": text1
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}"
+                        }
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "Give me Captions to post it on social media?"
+                    }
+                ]
+            }
+        ],
+        "max_tokens": 300
+    }
+
+    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+
+    if response.status_code == 200:
+        caption1 = response.json()["choices"][0]["message"]["content"]
+    else:
+        caption1 = "Error: Unable to get caption"
+
+    # Render a new page with the captions
+    return render_template('result.html', caption1=caption1)
 
 if __name__ == "__main__":
     app.run(debug=True)
