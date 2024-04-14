@@ -27,12 +27,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 app.secret_key = 'secret_key'
 
-api_key = "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"
-openai.api_key = "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"
+api_key = ""
+openai.api_key = ""
 
 client = OpenAI()
-api_key = "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"
-openai.api_key = "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"
+api_key = ""
+openai.api_key = ""
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
