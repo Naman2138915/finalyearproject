@@ -124,8 +124,21 @@ def generatefromimage():
     image = request.files["image"]
 
     output_buffer = generate_image(prompt, uncond_prompt, strength, image)
+
+    # Save the downloaded image to a folder on the backend
+    output_folder = "./generatedimages"  # Replace this with the path to your backend folder
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
     
-    return send_file(output_buffer, mimetype="image/png")
+    output_filename = "generated_image.png"  # Name of the saved image file
+    output_path = os.path.join(output_folder, output_filename)
+
+    with open(output_path, "wb") as f:
+        f.write(output_buffer.getvalue())
+
+    # Return the path to the saved image
+    
+    return send_file(output_path, mimetype="image/png")
 
 @app.route('/index')
 def index():
@@ -256,7 +269,7 @@ def process():
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode('utf-8')
     
-    image_path = "../images/dog.jpg"
+    image_path = "../sd/generatedimages/generated_image.png"
     base64_image = encode_image(image_path)
 
     headers = {
@@ -304,6 +317,14 @@ def process():
 
     # Render a new page with the captions
     return render_template('result.html', caption1=caption1)
+
+@app.route("/showimage")
+def show_image():
+    # Assuming the generated image is saved in the 'generatedimages' folder with the name 'generated_image.png'
+    image_path = "./generatedimages/generated_image.png"
+
+    # Return the image file
+    return send_file(image_path, mimetype="image/png")
 
 if __name__ == "__main__":
     app.run(debug=True)

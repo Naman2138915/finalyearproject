@@ -40,7 +40,7 @@
 
     <!-- Display the generated image -->
     <div id="image-container">
-        <img id="generated-image" src="https://via.placeholder.com/800x600" alt="Generated Image">
+        <img id="generated-image" src="/showimage" alt="Generated Image">
         <div id="crop-area"></div>
     </div>
 
@@ -71,13 +71,6 @@
     </div>
 
     <script>
-        // Retrieve the generated image URL from sessionStorage
-        const imageURL = sessionStorage.getItem("imageURL");
-        if (imageURL) {
-            // Set the src attribute of the generated image
-            document.getElementById("generated-image").src = imageURL;
-        }
-
         // Function to save changes
         function saveChanges() {
             const cropArea = document.getElementById("crop-area");
@@ -96,16 +89,22 @@
             canvas.width = croppedWidth;
             canvas.height = croppedHeight;
             const ctx = canvas.getContext("2d");
+
+            // Draw the image onto the canvas with applied cropping
             ctx.drawImage(generatedImage, offsetX * scaleX, offsetY * scaleY, croppedWidth, croppedHeight, 0, 0, croppedWidth, croppedHeight);
 
-            // Convert the canvas to a data URL and set it as the source of the generated image
-            const croppedDataURL = canvas.toDataURL();
-            generatedImage.src = croppedDataURL;
+            // Create a new Image object with the source of the canvas
+            const newImage = new Image();
+            newImage.onload = function() {
+                // Set the new image as the source of the generated image
+                generatedImage.src = newImage.src;
 
-            // Hide the crop area
-            cropArea.style.display = "none";
+                // Hide the crop area
+                cropArea.style.display = "none";
 
-            alert("Image cropped and changes saved successfully!");
+                alert("Image cropped and changes saved successfully!");
+            };
+            newImage.src = canvas.toDataURL(); // Set the source of the new image object
         }
 
         // Add event listeners to image editing buttons and inputs
@@ -211,6 +210,6 @@
 
         reader.readAsDataURL(file);
         });
-        </script>
-        </body>
-        </html>
+    </script>
+</body>
+</html>

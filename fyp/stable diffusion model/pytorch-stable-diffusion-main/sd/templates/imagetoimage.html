@@ -27,7 +27,7 @@
     <img id="generated-image" style="display: none;">
 
     <!-- Button to navigate to image editor page -->
-    <button id="edit-button" style="display: none;">Edit Image</button>
+    <button id="edit-button" style="display: none;">Get Captions</button>
 
     <script>
         document.getElementById("generate-form").addEventListener("submit", function(event) {
@@ -54,7 +54,7 @@
         // Add event listener to edit button
         document.getElementById("edit-button").addEventListener("click", function() {
             // Redirect to the image editor page
-            window.location.href = "/imageeditor";
+            window.location.href = "/caption";
         });
     </script>
 </body>
