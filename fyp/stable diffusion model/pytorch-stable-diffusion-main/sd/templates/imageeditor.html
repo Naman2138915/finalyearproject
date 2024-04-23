@@ -4,212 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Editor</title>
-    <style>
-        /* Add your CSS styles here */
-        #image-container {
-            position: relative;
-            display: inline-block;
-        }
-        
-        #crop-area {
-            border: 2px dashed red;
-            position: absolute;
-            display: none;
-            box-sizing: border-box; /* Ensure border is included in dimensions */
-            resize: both; /* Allow resizing */
-            overflow: hidden; /* Hide overflowing content */
-        }
-
-        #logo-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            border: 2px solid black;
-            padding: 5px;
-            background-color: white;
-        }
-
-        #logo-preview {
-            max-width: 100px;
-            max-height: 100px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='cropperjs/cropper.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> <!-- Link to external CSS file -->
+    <script src="{{ url_for('static', filename='cropperjs/cropper.js') }}"></script>
+    
 </head>
 <body>
-    <h1>Image Editor</h1>
+    <div class="main-container">
+        <div class="img-container">
+            <img id="image" src="/showimage">
+        </div>
+        <button id="btn-crop">Crop</button>
+        <div class="cropped-container">
+            <img src="" id="output">
+        </div>
 
-    <!-- Display the generated image -->
-    <div id="image-container">
-        <img id="generated-image" src="/showimage" alt="Generated Image">
-        <div id="crop-area"></div>
+        <!-- Image editing functionalities -->
+        <!-- Example: buttons to rotate and flip the image -->
+        <button id="rotate-left-button">Rotate Left</button>
+        <button id="rotate-right-button">Rotate Right</button>
+        <button id="flip-horizontal-button">Flip Horizontal</button>
+        <button id="flip-vertical-button">Flip Vertical</button>
+        <br>
+        <!-- Buttons for brightness and contrast adjustments -->
+        <label for="brightness">Brightness:</label>
+        <input type="range" id="brightness" min="0" max="200" value="100">
+        <label for="contrast">Contrast:</label>
+        <input type="range" id="contrast" min="0" max="200" value="100">
+        <br>
     </div>
+    
 
-    <!-- Add image editing functionalities here -->
-    <!-- Example: buttons to rotate and flip the image -->
-    <button id="rotate-left-button">Rotate Left</button>
-    <button id="rotate-right-button">Rotate Right</button>
-    <button id="flip-horizontal-button">Flip Horizontal</button>
-    <button id="flip-vertical-button">Flip Vertical</button>
-    <br>
-    <!-- Buttons for brightness and contrast adjustments -->
-    <label for="brightness">Brightness:</label>
-    <input type="range" id="brightness" min="0" max="200" value="100">
-    <label for="contrast">Contrast:</label>
-    <input type="range" id="contrast" min="0" max="200" value="100">
-    <br>
-
-    <!-- Add a button to save changes -->
-    <button id="save-changes-button">Save Changes</button>
-
-    <!-- Add a button to crop the image -->
-    <button id="crop-image-button">Crop Image</button>
-    <a href="/caption"><button>Go to Caption Page</button></a>
-    <!-- Add logo upload functionality -->
-    <div id="logo-container">
-        <input type="file" id="logo-upload" accept="image/*">
-        <img id="logo-preview" src="" alt="Logo Preview">
-    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
     <script>
-        // Function to save changes
-        function saveChanges() {
-            const cropArea = document.getElementById("crop-area");
-            const cropRect = cropArea.getBoundingClientRect();
-            const imageRect = document.getElementById("generated-image").getBoundingClientRect();
-            const generatedImage = document.getElementById("generated-image");
-            const scaleX = generatedImage.naturalWidth / generatedImage.width;
-            const scaleY = generatedImage.naturalHeight / generatedImage.height;
-            const croppedWidth = cropRect.width * scaleX;
-            const croppedHeight = cropRect.height * scaleY;
-            const offsetX = cropRect.left - imageRect.left;
-            const offsetY = cropRect.top - imageRect.top;
-
-            // Create a canvas to draw the cropped image
-            const canvas = document.createElement("canvas");
-            canvas.width = croppedWidth;
-            canvas.height = croppedHeight;
-            const ctx = canvas.getContext("2d");
-
-            // Draw the image onto the canvas with applied cropping
-            ctx.drawImage(generatedImage, offsetX * scaleX, offsetY * scaleY, croppedWidth, croppedHeight, 0, 0, croppedWidth, croppedHeight);
-
-            // Create a new Image object with the source of the canvas
-            const newImage = new Image();
-            newImage.onload = function() {
-                // Set the new image as the source of the generated image
-                generatedImage.src = newImage.src;
-
-                // Hide the crop area
-                cropArea.style.display = "none";
-
-                alert("Image cropped and changes saved successfully!");
-            };
-            newImage.src = canvas.toDataURL(); // Set the source of the new image object
-        }
-
         // Add event listeners to image editing buttons and inputs
         document.getElementById("rotate-left-button").addEventListener("click", function() {
-            document.getElementById("generated-image").style.transform = "rotate(-90deg)";
+            document.getElementById("output").style.transform = "rotate(-90deg)";
         });
 
         document.getElementById("rotate-right-button").addEventListener("click", function() {
-            document.getElementById("generated-image").style.transform = "rotate(90deg)";
+            document.getElementById("output").style.transform = "rotate(90deg)";
         });
 
         document.getElementById("flip-horizontal-button").addEventListener("click", function() {
-            document.getElementById("generated-image").style.transform = "scaleX(-1)";
+            document.getElementById("output").style.transform = "scaleX(-1)";
         });
 
         document.getElementById("flip-vertical-button").addEventListener("click", function() {
-            document.getElementById("generated-image").style.transform = "scaleY(-1)";
+            document.getElementById("output").style.transform = "scaleY(-1)";
         });
-
-        // Add event listener for Save Changes button
-        document.getElementById("save-changes-button").addEventListener("click", saveChanges);
 
         // Add event listener for brightness adjustment
         document.getElementById("brightness").addEventListener("input", function() {
             const brightnessValue = this.value;
-            document.getElementById("generated-image").style.filter = `brightness(${brightnessValue}%)`;
+            document.getElementById("output").style.filter = `brightness(${brightnessValue}%)`;
         });
 
         // Add event listener for contrast adjustment
         document.getElementById("contrast").addEventListener("input", function() {
             const contrastValue = this.value;
-            document.getElementById("generated-image").style.filter = `contrast(${contrastValue}%)`;
+            document.getElementById("output").style.filter = `contrast(${contrastValue}%)`;
         });
-
-        // Add event listener for cropping the image
-        document.getElementById("crop-image-button").addEventListener("click", function() {
-            const cropArea = document.getElementById("crop-area");
-            cropArea.style.display = "block";
-        });
-
-        // Function to handle dragging of the crop area
-        function startDragging(event) {
-            const cropArea = document.getElementById("crop-area");
-            const imageContainer = document.getElementById("image-container");
-            const initialX = event.clientX - cropArea.getBoundingClientRect().left;
-            const initialY = event.clientY - cropArea.getBoundingClientRect().top;
-
-            function moveCropArea(event) {
-                const newX = event.clientX - initialX;
-                const newY = event.clientY - initialY;
-                const maxX = imageContainer.offsetWidth - cropArea.offsetWidth;
-                const maxY = imageContainer.offsetHeight - cropArea.offsetHeight;
-                const clampedX = Math.min(Math.max(newX, 0), maxX);
-                const clampedY = Math.min(Math.max(newY, 0), maxY);
-                cropArea.style.left = clampedX + "px";
-                cropArea.style.top = clampedY + "px";
-            }
-
-            function stopDragging() {
-                document.removeEventListener("mousemove", moveCropArea);
-                document.removeEventListener("mouseup", stopDragging);
-            }
-
-            document.addEventListener("mousemove", moveCropArea);
-            document.addEventListener("mouseup", stopDragging);
-        }
-
-        document.getElementById("crop-area").addEventListener("mousedown", startDragging);
-
-        // Function to handle resizing of the crop area
-        function startResizing(event) {
-            const cropArea = document.getElementById("crop-area");
-            const initialWidth = cropArea.offsetWidth;
-            const initialHeight = cropArea.offsetHeight;
-            const initialX = event.clientX;
-            const initialY = event.clientY;
-
-        function resizeCropArea(event) {
-            const newWidth = initialWidth + (event.clientX - initialX);
-            const newHeight = initialHeight + (event.clientY - initialY);
-            cropArea.style.width = Math.max(newWidth, 100) + "px"; // Minimum width of 100px
-            cropArea.style.height = Math.max(newHeight, 100) + "px"; // Minimum height of 100px
-        }
-
-        function stopResizing() {
-            document.removeEventListener("mousemove", resizeCropArea);
-            document.removeEventListener("mouseup", stopResizing);
-        }
-
-        document.addEventListener("mousemove", resizeCropArea);
-        document.addEventListener("mouseup", stopResizing);
-        }
-
-        // Function to handle logo upload
-        document.getElementById("logo-upload").addEventListener("change", function(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = function(event) {
-            const logoPreview = document.getElementById("logo-preview");
-            logoPreview.src = event.target.result;
-        };
-
-        reader.readAsDataURL(file);
-        });
+        
     </script>
+    <div>
+        <h3>Caption 1:</h3>
+        <p>{{ caption1 }}</p>
+    </div>
+
 </body>
 </html>

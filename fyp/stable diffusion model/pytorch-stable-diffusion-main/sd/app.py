@@ -27,12 +27,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 app.secret_key = 'secret_key'
 
-api_key = ""
-openai.api_key = ""
+api_key = "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"
+openai.api_key = "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"
 
 client = OpenAI()
-api_key = ""
-openai.api_key = ""
+api_key = "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"
+openai.api_key = "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"
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -64,7 +64,7 @@ elif (torch.backends.mps.is_built() or torch.backends.mps.is_available()) and AL
 print(f"Using device: {DEVICE}")
 
 tokenizer = CLIPTokenizer("../data/vocab.json", merges_file="../data/merges.txt")
-model_file = "../data/v1-5-pruned-emaonly.ckpt"
+model_file = "../data/sd_cars.ckpt"
 models = loader.preload_models_from_standard_weights(model_file, DEVICE)
 
 
@@ -316,7 +316,7 @@ def process():
         caption1 = "Error: Unable to get caption"
 
     # Render a new page with the captions
-    return render_template('result.html', caption1=caption1)
+    return render_template('imageeditor.html', caption1=caption1)
 
 @app.route("/showimage")
 def show_image():
@@ -325,6 +325,10 @@ def show_image():
 
     # Return the image file
     return send_file(image_path, mimetype="image/png")
+
+@app.route('/crop')
+def crop():
+    return render_template('crop.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
