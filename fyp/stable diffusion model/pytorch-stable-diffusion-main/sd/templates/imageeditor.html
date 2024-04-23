@@ -7,7 +7,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='cropperjs/cropper.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> <!-- Link to external CSS file -->
     <script src="{{ url_for('static', filename='cropperjs/cropper.js') }}"></script>
-    
+    <style>
+        .cropped-container {
+            position: relative;
+        }
+        #template-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Make sure the template doesn't interfere with user interaction */
+            z-index: 1; /* Ensure the template overlay is above the output image */
+        }
+    </style>
 </head>
 <body>
     <div class="main-container">
@@ -17,6 +30,7 @@
         <button id="btn-crop">Crop</button>
         <div class="cropped-container">
             <img src="" id="output">
+            <img src="/static/template0.png" id="template-overlay"> <!-- Default Template overlay image -->
         </div>
 
         <!-- Image editing functionalities -->
@@ -32,8 +46,41 @@
         <label for="contrast">Contrast:</label>
         <input type="range" id="contrast" min="0" max="200" value="100">
         <br>
+
+        <!-- Input for uploading logo 1 -->
+        <label for="logo">Upload Logo 1:</label>
+        <input type="file" id="logo1" accept="image/*">
+        
+        <!-- Dropdown menu for selecting the image format -->
+
+        
+        <!-- Dropdown menu for selecting templates -->
+        <label for="template">Select Template:</label>
+        <select id="template">
+            <option value="template1" selected>Default</option>
+            <option value="template2">Template 1</option>
+            <option value="template3">Template 2</option>
+            <option value="template4">Coming Soon</option>
+        </select>
+        <a href="https://www.instagram.com/" target="_blank" title="">
+            UPLOAD IT ON INSTAGRAM
+        </a>
+        <a href="https://www.facebook.com/" target="_blank" title="">
+            UPLOAD IT ON FACEBOOK
+        </a>
+        <a href="https://twitter.com/" target="_blank" title="">
+            UPLOAD IT ON TWITTER
+        </a>
+
+        <label for="format">Select Format:</label>
+        <select id="format">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+            <!-- Add more options as needed -->
+        </select>
+        <!-- Button to download the image -->
+        <button id="download-button">Download Image</button>
     </div>
-    
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 
@@ -66,12 +113,81 @@
             const contrastValue = this.value;
             document.getElementById("output").style.filter = `contrast(${contrastValue}%)`;
         });
-        
+
+        // Add event listener for uploading logo 1
+        document.getElementById("logo1").addEventListener("change", function() {
+            const file = this.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const logoSrc = e.target.result;
+                const logo = new Image();
+                logo.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = document.getElementById("output").naturalWidth;
+                    canvas.height = document.getElementById("output").naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(document.getElementById("output"), 0, 0);
+                    const logoWidth = 200; // Adjust the logo size as needed
+                    const logoHeight = (logo.height / logo.width) * logoWidth;
+                    ctx.drawImage(logo, 10, 10, logoWidth, logoHeight); // Adjust the position as needed
+                    // Add template overlay
+                    const templateOverlay = document.getElementById("template-overlay");
+                    ctx.drawImage(templateOverlay, 0, 0, canvas.width, canvas.height);
+                    document.getElementById("output").src = canvas.toDataURL();
+                };
+                logo.src = logoSrc;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Trigger change event for template dropdown to apply default template
+        document.getElementById("template").dispatchEvent(new Event('change'));
+
+        // Add event listener for selecting template
+        document.getElementById("template").addEventListener("change", function() {
+            const selectedTemplate = this.value;
+            const templateOverlay = document.getElementById("template-overlay");
+            
+            switch(selectedTemplate) {
+                case "none":
+                    templateOverlay.src = ""; // Remove template overlay
+                    break;
+                case "template1":
+                    templateOverlay.src = "/static/template0.png"; // Replace 'path_to_template1_image' with the actual path to your template image
+                    break;
+                case "template2":
+                    templateOverlay.src = "/static/template1.png"; // Replace 'path_to_template2_image' with the actual path to your template image
+                    break;
+                case "template3":
+                    templateOverlay.src = "/static/template2.png"; // Replace 'path_to_template3_image' with the actual path to your template image
+                    break;
+                case "template4":
+                    templateOverlay.src = "/static/template0.png"; // Replace 'path_to_template4_image' with the actual path to your template image
+                    break;
+                default:
+                    templateOverlay.src = ""; // Remove template overlay if none selected
+            }
+        });
+
+        // Add event listener for downloading the edited image
+        document.getElementById("download-button").addEventListener("click", function() {
+            const format = document.getElementById("format").value;
+            const canvas = document.createElement('canvas');
+            canvas.width = document.getElementById("output").naturalWidth;
+            canvas.height = document.getElementById("output").naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.filter = document.getElementById("output").style.filter; // Apply CSS filter to the canvas
+            ctx.drawImage(document.getElementById("output"), 0, 0);
+            // Add template overlay to the canvas
+            const templateOverlay = document.getElementById("template-overlay");
+            ctx.drawImage(templateOverlay, 0, 0, canvas.width, canvas.height);
+            const link = document.createElement('a');
+            link.download = 'edited_image.' + format; // Set the filename with selected format
+            link.href = canvas.toDataURL('image/' + format); // Set the format dynamically
+            link.click();
+        });
+
     </script>
-    <div>
-        <h3>Caption 1:</h3>
-        <p>{{ caption1 }}</p>
-    </div>
 
 </body>
 </html>

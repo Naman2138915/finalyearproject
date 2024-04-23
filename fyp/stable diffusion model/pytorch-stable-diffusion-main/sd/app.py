@@ -102,18 +102,40 @@ def generate_image(prompt, uncond_prompt, strength, image_file):
 
     return output_buffer
 
-@app.route("/openaiimage", methods=['GET','POST'])
+output_folder = "./generatedimages"  # Replace this with the path to your backend folder
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
+output_folder = "./generatedimages"  # Replace this with the path to your backend folder
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
+@app.route("/openaiimage", methods=['GET', 'POST'])
 def openaiimage():
     image_url = None
     if request.method == 'POST':
         text = request.form['text']
         response = openai.images.generate(
-        # Update with the desired engine
+            # Update with the desired engine
             prompt=text,
             size="1024x1024",
             n=1
         )
         image_url = response.data[0].url
+
+        # Download the image from the URL
+        image_response = requests.get(image_url)
+        if image_response.status_code == 200:
+            output_filename = "generated_image.png"  # Name of the saved image file
+            output_path = os.path.join(output_folder, output_filename)
+
+            # Save the image to disk
+            with open(output_path, "wb") as f:
+                f.write(image_response.content)
+
+            # Return the path to the saved image
+            return render_template('openai.html', image_url=image_url)
+
     return render_template('openai.html', image_url=image_url)
 
 @app.route("/generatefromimage", methods=["POST"])
@@ -211,7 +233,6 @@ def generate():
     prompt = request.form.get("prompt")
     uncond_prompt = request.form.get("uncond_prompt")
 
-
     # Check if the prompt is empty
     if not prompt:
         return "Prompt cannot be empty.", 400
@@ -242,11 +263,14 @@ def generate():
         # Convert the NumPy array to PIL Image
         output_image_pil = Image.fromarray(output_image_np)
 
-        output_buffer = BytesIO()
-        output_image_pil.save(output_buffer, format="PNG")
-        output_buffer.seek(0)
+        output_filename = "generated_image.png"  # Name of the saved image file
+        output_path = os.path.join(output_folder, output_filename)
 
-        return send_file(output_buffer, mimetype="image/png")
+        # Save the image to disk
+        output_image_pil.save(output_path)
+
+        # Return the path to the saved image
+        return send_file(output_path, mimetype="image/png")
 
     except Exception as e:
         print("Error generating image:", e)
