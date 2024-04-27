@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Input Form and Generated Image</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif; 
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            font-size: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 50px;
+        }
+
+        form {
+            margin-top: 50px;
+            text-align: center;
+        }
+        input[type="text"],
+        textarea {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 80%;
+            max-width: 400px;
+            resize: none;
+            font-family: orbitron;
+        }
+
+        button[type="submit"] {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            font-size: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif; 
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        hr {
+            margin-top: 50px;
+        }
+
+        img {
+            max-width: auto;
+            border: 2px solid #007bff; 
+            border-radius: 5px;
+            margin-top: 20px; 
+        }
+        .home-btn {
+            position: absolute; 
+            top: 20px;
+            right: 50px; 
+            padding: 20px 40px; 
+            font-size: 30px; 
+            border-radius: 10px;
+            height: auto; 
+            width: auto;
+            text-align: center; 
+            line-height: 50px; 
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 20px;
+            margin: 10px; 
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif; 
+        }
+    
+        .logo {
+            position: absolute; 
+            top: 0px;
+            left: 20px; 
+            width: auto; 
+            height: 200px; 
+            border: none;
+        }
+        
+    </style>
+</head>
+<body>
+    <h1>Generate Captions</h1>
+    <img src="/static/logo.png" alt="VISULVIBESAI" class="logo">
+    <a href="/index" class="btn home-btn">HOME</a>
+    <form action="/process" method="post">
+        <label for="text1">Give us your business description:</label><br>
+        <textarea id="text1" placeholder="Enter text here" name="text1" rows="4" cols="50"></textarea><br>
+        <button type="submit">Get Captions</button>
+    </form>
+    <hr>
+    <h1>Generated Image</h1>
+    <img src="/showimage" alt="Generated Image">
+</body>
+</html>

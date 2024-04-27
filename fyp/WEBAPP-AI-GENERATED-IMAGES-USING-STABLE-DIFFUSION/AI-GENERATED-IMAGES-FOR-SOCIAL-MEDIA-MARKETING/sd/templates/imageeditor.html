@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='cropperjs/cropper.css') }}">
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif; 
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            font-size: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 50px;
+        }
+
+        .main-container {
+            width: auto;
+            margin: auto;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center; 
+        }
+
+        .img-container {
+            margin-bottom: 20px;
+        }
+
+        .cropped-container {
+            position: relative;
+            width: auto;
+            height: auto;
+            text-align: center;
+            justify-content: center;
+            background-color: ghostwhite;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #007bff; 
+            border-radius: 5px;
+        }
+
+        #btn-crop {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif; 
+        }
+
+        #btn-crop:hover {
+            background-color: #0056b3;
+        }
+
+        #output {
+            margin: 20px auto;
+            max-width: 100%;
+            border: 2px solid #007bff; 
+            border-radius: 5px;
+        }
+
+        label {
+            font-size: 20px;
+            color: #333;
+            margin-top: 20px;
+            display: block;
+        }
+
+        select, input[type="range"], input[type="file"] {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        #template {
+            margin-bottom: 20px;
+        }
+
+        #format {
+            margin-bottom: 20px;
+        }
+
+        #download-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif; 
+        }
+
+        #download-button:hover {
+            background-color: #0056b3;
+        }
+
+        #template-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #caption-container {
+            margin-top: 20px;
+        }
+
+        #caption {
+            font-size: 20px;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        #caption-output {
+            font-size: 20px;
+            color: #333;
+            margin-top: 20px;
+        }
+        .button-label {
+            font-size: 20px;
+            color: #333;
+            margin-top: 20px;
+            display: block;
+        }
+
+        .rotation-button,
+        .flip-button {
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif; 
+            margin-top: 10px; 
+        }
+
+        .rotation-button:hover,
+        .flip-button:hover {
+            background-color: #0056b3;
+        }
+        .instagram-button {
+            text-decoration: none; 
+        }
+
+        .social-button {
+            padding: 10px 20px; 
+            font-size: 20px;
+            background-color: #C13584; 
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif; 
+            margin-top: 10px; 
+        }
+
+        .social-button:hover {
+            background-color: #A8336D; 
+        }
+        .home-btn {
+            position: absolute; 
+            top: 20px;
+            right: 50px; 
+            padding: 20px 40px; 
+            font-size: 30px; 
+            border-radius: 10px;
+            height: auto; 
+            width: auto;
+            text-align: center; 
+            line-height: 50px; 
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 20px;
+            margin: 10px; 
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif; 
+        }
+        .logo {
+            position: absolute; 
+            top: 0px;
+            left: 20px; 
+            width: auto; 
+            height: 200px; 
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>IMAGE EDITOR</h1>
+    <img src="/static/logo.png" alt="VISULVIBESAI" class="logo"> 
+    <a href="/index" class="btn home-btn">HOME</a>
+    <div id="caption-container">
+        <div>
+            <h3>Generated Captions</h3>
+            <p id="caption1">{{ caption1 }}</p>
+        </div>
+    </div>
+    <div class="main-container">
+        <div class="img-container" style="border: 2px solid #007bff; border-radius: 5px;">
+            <img id="image" src="/showimage" >
+        </div>
+        <button id="btn-crop">Crop</button>
+        <div class="cropped-container">
+            <img src="" id="output">
+            <img src="/static/template0.png" id="template-overlay"> 
+        </div>
+        <label for="brightness">Brightness:</label>
+        <input type="range" id="brightness" min="0" max="200" value="100">
+        <label for="contrast">Contrast:</label>
+        <input type="range" id="contrast" min="0" max="200" value="100">
+        <button id="rotate-left-button" class="rotation-button">Rotate Left</button>
+        <button id="rotate-right-button" class="rotation-button">Rotate Right</button>
+        <button id="flip-horizontal-button" class="flip-button">Flip Horizontal</button>
+        <button id="flip-vertical-button" class="flip-button">Flip Vertical</button>
+        <label for="logo1">Upload Logo 1:</label>
+        <input type="file" id="logo1" accept="image/*">
+        <label for="template">Select Template:</label>
+        <select id="template">
+            <option value="none" selected>No Template</option>
+            <option value="template1">Template 1</option>
+            <option value="template2">Template 2</option>
+            <option value="template3">Coming Soon</option>
+        </select>
+        <label for="format">Select Format:</label>
+        <select id="format">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+        </select>
+        <button id="download-button">Download Image</button>
+        <div>
+            <a href="https://www.instagram.com" target="_blank" class="instagram-button">
+                <button class="social-button">UPLOAD ON INSTAGRAM</button>
+            </a>
+            <a href="https://www.facebook.com" target="_blank" class="instagram-button">
+                <button class="social-button">UPLOAD ON FACEBOOK</button>
+            </a>
+            <a href="https://www.twitter.com" target="_blank" class="instagram-button">
+                <button class="social-button">UPLOAD ON TWITTER</button>
+            </a>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='cropperjs/cropper.js') }}"></script>
+    <script>
+        const image = document.getElementById('image');
+        const cropper = new Cropper(image, {
+            aspectRatio: 1,
+        });
+        document.querySelector('#btn-crop').addEventListener('click', function() {
+            var croppedImage = cropper.getCroppedCanvas().toDataURL("image/png");
+            document.getElementById('output').src = croppedImage;
+            document.querySelector(".cropped-container").style.display = 'flex';
+        });
+    </script>
+    <script>
+        document.getElementById("brightness").addEventListener("input", function() {
+            const brightnessValue = this.value;
+            document.getElementById("output").style.filter = `brightness(${brightnessValue}%)`;
+        });
+        document.getElementById("contrast").addEventListener("input", function() {
+            const contrastValue = this.value;
+            document.getElementById("output").style.filter = `contrast(${contrastValue}%)`;
+        });
+        document.getElementById("rotate-left-button").addEventListener("click", function() {
+            document.getElementById("output").style.transform = "rotate(-90deg)";
+        });
+        document.getElementById("rotate-right-button").addEventListener("click", function() {
+            document.getElementById("output").style.transform = "rotate(90deg)";
+        });
+        document.getElementById("flip-horizontal-button").addEventListener("click", function() {
+            document.getElementById("output").style.transform = "scaleX(-1)";
+        });
+        document.getElementById("flip-vertical-button").addEventListener("click", function() {
+            document.getElementById("output").style.transform = "scaleY(-1)";
+        });
+        document.getElementById("logo1").addEventListener("change", function() {
+            const file = this.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const logoSrc = e.target.result;
+                const logo = new Image();
+                logo.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = document.getElementById("output").naturalWidth;
+                    canvas.height = document.getElementById("output").naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(document.getElementById("output"), 0, 0);
+                    const logoWidth = 200; 
+                    const logoHeight = (logo.height / logo.width) * logoWidth;
+                    ctx.drawImage(logo, 10, 10, logoWidth, logoHeight); 
+                    // Add template overlay
+                    const templateOverlay = document.getElementById("template-overlay");
+                    ctx.drawImage(templateOverlay, 0, 0, canvas.width, canvas.height);
+                    document.getElementById("output").src = canvas.toDataURL();
+                };
+                logo.src = logoSrc;
+            };
+            reader.readAsDataURL(file);
+        });
+        document.getElementById("template").addEventListener("change", function() {
+            const selectedTemplate = this.value;
+            const templateOverlay = document.getElementById("template-overlay");
+            switch(selectedTemplate) {
+                case "none":
+                    templateOverlay.style.display = "none"; 
+                    break;
+                case "template1":
+                    templateOverlay.src = "/static/template1.png"; 
+                    templateOverlay.style.display = "block"; 
+                    break;
+                case "template2":
+                    templateOverlay.src = "/static/template2.png"; 
+                    templateOverlay.style.display = "block"; 
+                    break;
+                case "template3":
+                    templateOverlay.src = "/static/template0.png"; 
+                    templateOverlay.style.display = "block"; 
+                    break;
+                default:
+                    templateOverlay.style.display = "none"; 
+            }
+        });
+        document.getElementById("download-button").addEventListener("click", function() {
+            const format = document.getElementById("format").value;
+            const canvas = document.createElement('canvas');
+            canvas.width = document.getElementById("output").naturalWidth;
+            canvas.height = document.getElementById("output").naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.filter = document.getElementById("output").style.filter; 
+            ctx.drawImage(document.getElementById("output"), 0, 0);
+            const templateOverlay = document.getElementById("template-overlay");
+            ctx.drawImage(templateOverlay, 0, 0, canvas.width, canvas.height);
+            const link = document.createElement('a');
+            link.download = 'edited_image.' + format; 
+            link.href = canvas.toDataURL('image/' + format); 
+            link.click();
+        });
+    </script>
+</body>
+</html>

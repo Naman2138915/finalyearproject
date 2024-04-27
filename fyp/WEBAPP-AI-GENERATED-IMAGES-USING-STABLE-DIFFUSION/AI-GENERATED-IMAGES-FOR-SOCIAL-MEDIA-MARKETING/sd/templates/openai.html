@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif; 
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            font-size: 30px;
+        }
+        h1 {
+            color: #333;
+            margin-top: 50px;
+        }
+        form {
+            margin-top: 50px;
+            text-align: center;
+        }
+        input[type="text"],
+        input[type="submit"] {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .image {
+            border: 2px solid #007bff; 
+            padding: 0; 
+            margin: 20px auto; 
+            max-width: 1024px; 
+            width: 100%;
+        }
+
+        .image img {
+            max-width: 100%; 
+            height: auto; 
+            width: 100%; 
+        }
+
+        .btn {
+            display: none; 
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif; 
+            margin-top: 20px;
+            text-decoration: none; 
+        }
+        .btn1 {
+            display: block; 
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif; 
+            margin-top: 20px;
+            text-decoration: none; 
+        }
+        .btn1:hover {
+            background-color: #0056b3;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .home-btn {
+            position: absolute; 
+            top: 20px;
+            right: 50px; 
+            padding: 20px 40px; 
+            font-size: 30px; 
+            border-radius: 10px;
+            height: auto;
+            width: auto;
+            text-align: center; 
+            line-height: 50px;
+        }
+        .logo {
+            position: absolute; 
+            top: 0px;
+            left: 20px; 
+            width: auto; 
+            height: 200px;
+            border: none;
+        } 
+    </style>
+</head>
+<body>
+    <h1>GENERATE IMAGE USING OPENAI</h1>
+    <img src="/static/logo.png" alt="VISULVIBESAI" class="logo">
+    <form action="/openaiimage" method="post">
+        <input type="text" name="text" placeholder="Enter text here" required/>
+        <input type="submit" value="Generate"/>
+    </form>
+    {% if image_url %}
+    <div class="image">
+        <img src="{{ image_url }}" alt="Generated Image"/>
+    </div>
+    <a href="/caption" class="btn btn-dark" id="caption-button">Generate captions for the image</a>
+    {% endif %}
+    <script>
+        var imageExists = "{{ image_url }}" !== "";
+        if (imageExists) {
+            document.getElementById("caption-button").style.display = "inline-block";
+        }
+        document.getElementById("caption-button").addEventListener("click", function() {
+            window.location.href = "/caption";
+        });
+    </script>
+    <a href="/index" class="btn1 home-btn">HOME</a>
+</body>
+</html>

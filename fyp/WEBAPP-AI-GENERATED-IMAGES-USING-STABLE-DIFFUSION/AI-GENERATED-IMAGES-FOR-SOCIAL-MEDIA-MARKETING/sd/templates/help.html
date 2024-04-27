@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My App - How It Works</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            font-size: 30px;
+        }
+
+        h1, h2 {
+            color: #333;
+            margin-top: 50px;
+        }
+
+        p {
+            color: #666;
+        }
+
+        img {
+            max-width: auto;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .functionality {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .functionality img {
+            max-width: 80%;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .home-btn {
+            position: absolute; 
+            top: 20px;
+            right: 50px; 
+            padding: 20px 40px; 
+            font-size: 30px; 
+            border-radius: 10px;
+            height: auto; 
+            width: auto;
+            text-align: center; 
+            line-height: 50px; 
+        }
+        .btn1 {
+            display: block; 
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif; 
+            margin-top: 20px;
+            text-decoration: none; 
+        }
+        .btn1:hover {
+            background-color: #0056b3;
+        }
+        .logo {
+            position: absolute; 
+            top: 0px;
+            left: 20px; 
+            width: auto; 
+            height: 200px; 
+            border: none;
+        }
+        
+    </style>
+</head>
+<body>
+    <img src="/static/logo.png" alt="VISULVIBESAI" class="logo">
+    <a href="/index" class="btn1 home-btn">HOME</a>
+    <h1>How App Works</h1>
+    <div class="functionality">
+        <h2>Functionality 1: Image from Image (Free Model) (512*512px)</h2>
+        <p>Upload an image, and our free model will generate a modified version based on the input. Strenth is how much you want to change the current image. Unconditional prompt is what you don't want in the generated image</p>
+        <img src="static/imagetoimage.png" alt="Functionality 1 Screenshot">
+    </div>
+    <div class="functionality">
+        <h2>Functionality 2: Text to Image (Free Model) (512*512px)</h2>
+        <p>Convert text into images using our free model. Simply input text, and the model will generate an image representing the provided text. Unconditional prompt is what you don't want in the generated image</p>
+        <img src="static/texttoimage.png" alt="Functionality 2 Screenshot">
+    </div>
+    <div class="functionality">
+        <h2>Functionality 3: Text to Image (OpenAI - Paid) (1024*1024px)</h2>
+        <p>Similar to the free text-to-image feature, but this utilizes a paid model from OpenAI.</p>
+        <img src="static/openai.png" alt="Functionality 3 Screenshot">
+    </div>
+    <div class="functionality">
+        <h2>Functionality 4: Generate Captions for Social Media Post</h2>
+        <p>Generate captions for your social media posts by analyzing the image you've generated. Our app will analyze the content of the generated image and suggest suitable captions for your posts.</p>
+        <img src="static/Caption.png" alt="Functionality 4 Screenshot">
+        <img src="static/Caption1.png" alt="Functionality 4 Screenshot">
+    </div>
+    <div class="functionality">
+        <h2>Functionality 5: Edit Image and Download</h2>
+        <p>Edit your generated images by applying various effects such as cropping, adding templates, rotating, adjusting brightness, and contrast. Once satisfied with the edits, you can download the edited image in your desired format (e.g., PNG or JPEG).</p>
+        <img src="static/imageeditor.png" alt="Functionality 5 Screenshot">
+        <img src="static/imageeditor1.png" alt="Functionality 5 Screenshot">
+    </div>
+    <h1>Thank You!</h1>
+</body>
+</html>
